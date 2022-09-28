@@ -60,6 +60,14 @@ module.exports.dislikeCard = (req, res) => {
     { $pull: { likes: req.user._id } },
     { new: true }
   )
-    .then((card) => res.send({ data: card }))
-    .catch((err) => res.status(500).send({ message: "Произошла ошибка" }));
+    .orFail(new NotFoundError("Передан несуществующий id карточки."))
+    .then((user) => res.send({ data: user }))
+    .catch((err) => {
+      let { status = 500, message = "Произошла ошибка" } = err;
+      if (err.name === "CastError") {
+        status = 400;
+        message = err.message;
+      }
+      res.status(status).send({ message });
+    });
 };
