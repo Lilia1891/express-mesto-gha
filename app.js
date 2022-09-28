@@ -19,6 +19,9 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use("/users", userRouter);
 app.use("/cards", cardRouter);
+app.use("*", function (req, res) {
+  res.status(404).send({ message: "Страница не найдена" });
+});
 
 mongoose.connect("mongodb://localhost:27017/mestodb", {
   useNewUrlParser: true,
