@@ -1,23 +1,30 @@
 const Card = require("../models/card");
 const NotFoundError = require("../Errors/NotFoundError");
+const { BAD_REQUEST_ERROR, INTERNAL_SERVER_ERROR } = require("../constants.js");
 
 module.exports.getCards = (req, res) => {
   Card.find({})
     .then((card) => res.send({ data: card }))
-    .catch(() => res.status(500).send({ message: "Произошла ошибка" }));
+    .catch(() =>
+      res
+        .status(INTERNAL_SERVER_ERROR)
+        .send({ message: "На сервере произошла ошибка" })
+    );
 };
 
 module.exports.createCard = (req, res) => {
   const { name, link } = req.body;
-  Card.create({ name: name, link: link, owner: req.user._id })
+  Card.create({ name, link, owner: req.user._id })
     .then((card) => res.send({ data: card }))
     .catch((err) => {
       if (err.name === "ValidationError") {
-        res.status(400).send({
+        res.status(BAD_REQUEST_ERROR).send({
           message: " Переданы некорректные данные при создании карточки.",
         });
       } else {
-        res.status(500).send({ message: "Произошла ошибка" });
+        res
+          .status(INTERNAL_SERVER_ERROR)
+          .send({ message: "На сервере произошла ошибка" });
       }
     });
 };
@@ -27,9 +34,12 @@ module.exports.deleteCard = (req, res) => {
     .orFail(new NotFoundError("Запрашиваемая карточка не найдена"))
     .then((user) => res.send({ data: user }))
     .catch((err) => {
-      let { status = 500, message = "Произошла ошибка" } = err;
+      let {
+        status = INTERNAL_SERVER_ERROR,
+        message = "На сервере произошла ошибка",
+      } = err;
       if (err.name === "CastError") {
-        status = 400;
+        status = BAD_REQUEST_ERROR;
         message = "Передан некорректный id";
       }
       res.status(status).send({ message });
@@ -45,9 +55,12 @@ module.exports.likeCard = (req, res) => {
     .orFail(new NotFoundError("Передан несуществующий id карточки."))
     .then((user) => res.send({ data: user }))
     .catch((err) => {
-      let { status = 500, message = "Произошла ошибка" } = err;
+      let {
+        status = INTERNAL_SERVER_ERROR,
+        message = "На сервере произошла ошибка",
+      } = err;
       if (err.name === "CastError") {
-        status = 400;
+        status = BAD_REQUEST_ERROR;
         message = "Передан некорректный id";
       }
       res.status(status).send({ message });
@@ -63,9 +76,12 @@ module.exports.dislikeCard = (req, res) => {
     .orFail(new NotFoundError("Передан несуществующий id карточки."))
     .then((user) => res.send({ data: user }))
     .catch((err) => {
-      let { status = 500, message = "Произошла ошибка" } = err;
+      let {
+        status = INTERNAL_SERVER_ERROR,
+        message = "На сервере произошла ошибка",
+      } = err;
       if (err.name === "CastError") {
-        status = 400;
+        status = BAD_REQUEST_ERROR;
         message = "Передан некорректный id";
       }
       res.status(status).send({ message });

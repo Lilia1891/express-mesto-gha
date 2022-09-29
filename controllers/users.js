@@ -1,10 +1,15 @@
 const User = require("../models/user");
 const NotFoundError = require("../Errors/NotFoundError");
+const { BAD_REQUEST_ERROR, INTERNAL_SERVER_ERROR } = require("../constants.js");
 
 module.exports.getUsers = (req, res) => {
   User.find({})
     .then((user) => res.send({ data: user }))
-    .catch(() => res.status(500).send({ message: "Произошла ошибка" }));
+    .catch(() =>
+      res
+        .status(INTERNAL_SERVER_ERROR)
+        .send({ message: "На сервере произошла ошибка" })
+    );
 };
 
 module.exports.getUserId = (req, res) => {
@@ -12,9 +17,12 @@ module.exports.getUserId = (req, res) => {
     .orFail(new NotFoundError("Запрашиваемый пользователь не найден"))
     .then((user) => res.send({ data: user }))
     .catch((err) => {
-      let { status = 500, message = "Произошла ошибка" } = err;
+      let {
+        status = INTERNAL_SERVER_ERROR,
+        message = "На сервере произошла ошибка",
+      } = err;
       if (err.name === "CastError") {
-        status = 400;
+        status = BAD_REQUEST_ERROR;
         message = "Передан некорректный id";
       }
       res.status(status).send({ message });
@@ -27,11 +35,13 @@ module.exports.createUser = (req, res) => {
     .then((user) => res.send({ data: user }))
     .catch((err) => {
       if (err.name === "ValidationError") {
-        res.status(400).send({
+        res.status(BAD_REQUEST_ERROR).send({
           message: "Переданы некорректные данные при создании пользователя.",
         });
       } else {
-        res.status(500).send({ message: "Произошла ошибка" });
+        res
+          .status(INTERNAL_SERVER_ERROR)
+          .send({ message: "На сервере произошла ошибка" });
       }
     });
 };
@@ -47,9 +57,11 @@ module.exports.updateUser = (req, res) => {
     .then((user) => res.send({ data: user }))
     .catch((err) => {
       if (err.name === "ValidationError") {
-        res.status(400).send({ message: err.message });
+        res.status(BAD_REQUEST_ERROR).send({ message: err.message });
       } else {
-        res.status(500).send({ message: "Произошла ошибка" });
+        res
+          .status(INTERNAL_SERVER_ERROR)
+          .send({ message: "На сервере произошла ошибка" });
       }
     });
 };
@@ -68,9 +80,11 @@ module.exports.updateAvatar = (req, res) => {
     .then((user) => res.send({ data: user }))
     .catch((err) => {
       if (err.name === "ValidationError") {
-        res.status(400).send({ message: err.message });
+        res.status(BAD_REQUEST_ERROR).send({ message: err.message });
       } else {
-        res.status(500).send({ message: "Произошла ошибка" });
+        res
+          .status(INTERNAL_SERVER_ERROR)
+          .send({ message: "На сервере произошла ошибка" });
       }
     });
 };

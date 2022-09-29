@@ -1,7 +1,8 @@
+const { NOT_FOUND_ERROR } = require("../constants.js");
 class NotFoundError extends Error {
   constructor(message) {
     super(message);
-    this.status = 404;
+    this.status = NOT_FOUND_ERROR;
     this.errorMessage = message;
     this.name = "NotFoundError";
   }
