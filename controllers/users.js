@@ -1,6 +1,10 @@
 const User = require("../models/user");
 const NotFoundError = require("../Errors/NotFoundError");
-const { BAD_REQUEST_ERROR, INTERNAL_SERVER_ERROR } = require("../constants.js");
+const {
+  BAD_REQUEST_ERROR,
+  NOT_FOUND_ERROR,
+  INTERNAL_SERVER_ERROR,
+} = require("../constants.js");
 
 module.exports.getUsers = (req, res) => {
   User.find({})
@@ -56,13 +60,16 @@ module.exports.updateUser = (req, res) => {
     .orFail(new NotFoundError("Запрашиваемый пользователь не найден"))
     .then((user) => res.send({ data: user }))
     .catch((err) => {
+      let {
+        status = INTERNAL_SERVER_ERROR,
+        message = "На сервере произошла ошибка",
+      } = err;
+
       if (err.name === "ValidationError") {
-        res.status(BAD_REQUEST_ERROR).send({ message: err.message });
-      } else {
-        res
-          .status(INTERNAL_SERVER_ERROR)
-          .send({ message: "На сервере произошла ошибка" });
+        status = BAD_REQUEST_ERROR;
+        message = "Переданы некорректные данные";
       }
+      res.status(status).send({ message });
     });
 };
 
@@ -79,12 +86,15 @@ module.exports.updateAvatar = (req, res) => {
     .orFail(new NotFoundError("Запрашиваемый пользователь не найден"))
     .then((user) => res.send({ data: user }))
     .catch((err) => {
+      let {
+        status = INTERNAL_SERVER_ERROR,
+        message = "На сервере произошла ошибка",
+      } = err;
+
       if (err.name === "ValidationError") {
-        res.status(BAD_REQUEST_ERROR).send({ message: err.message });
-      } else {
-        res
-          .status(INTERNAL_SERVER_ERROR)
-          .send({ message: "На сервере произошла ошибка" });
+        status = BAD_REQUEST_ERROR;
+        message = "Переданы некорректные данные";
       }
+      res.status(status).send({ message });
     });
 };
