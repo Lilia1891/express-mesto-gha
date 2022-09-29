@@ -15,7 +15,7 @@ module.exports.getUserId = (req, res) => {
       let { status = 500, message = "Произошла ошибка" } = err;
       if (err.name === "CastError") {
         status = 400;
-        message = err.message;
+        message = "Передан некорректный id";
       }
       res.status(status).send({ message });
     });

@@ -30,7 +30,7 @@ module.exports.deleteCard = (req, res) => {
       let { status = 500, message = "Произошла ошибка" } = err;
       if (err.name === "CastError") {
         status = 400;
-        message = err.message;
+        message = "Передан некорректный id";
       }
       res.status(status).send({ message });
     });
@@ -48,7 +48,7 @@ module.exports.likeCard = (req, res) => {
       let { status = 500, message = "Произошла ошибка" } = err;
       if (err.name === "CastError") {
         status = 400;
-        message = err.message;
+        message = "Передан некорректный id";
       }
       res.status(status).send({ message });
     });
@@ -66,7 +66,7 @@ module.exports.dislikeCard = (req, res) => {
       let { status = 500, message = "Произошла ошибка" } = err;
       if (err.name === "CastError") {
         status = 400;
-        message = err.message;
+        message = "Передан некорректный id";
       }
       res.status(status).send({ message });
     });
