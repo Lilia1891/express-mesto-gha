@@ -4,6 +4,10 @@ const bodyParser = require('body-parser');
 const userRouter = require('./routes/users');
 const cardRouter = require('./routes/cards');
 const { NOT_FOUND_ERROR } = require('./constants');
+const {
+  createUser,
+  login,
+} = require('./controllers/users');
 
 const { PORT = 3000 } = process.env;
 
@@ -21,6 +25,8 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use('/users', userRouter);
 app.use('/cards', cardRouter);
+app.post('/signin', login);
+app.post('/signup', createUser);
 app.use('*', (req, res) => {
   res.status(NOT_FOUND_ERROR).send({ message: 'Страница не найдена' });
 });

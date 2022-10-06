@@ -1,9 +1,11 @@
 const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken');
 const User = require('../models/user');
 const NotFoundError = require('../Errors/NotFoundError');
 const {
   BAD_REQUEST_ERROR,
   INTERNAL_SERVER_ERROR,
+  UNAUTHORIZED,
 } = require('../constants');
 
 module.exports.getUsers = (req, res) => {
@@ -101,5 +103,20 @@ module.exports.updateAvatar = (req, res) => {
         message = 'Переданы некорректные данные';
       }
       res.status(status).send({ message });
+    });
+};
+
+module.exports.login = (req, res) => {
+  const { email, password } = req.body;
+
+  return User.findUserByCredentials(email, password)
+    .then((user) => {
+      const token = jwt.sign({ _id: user._id }, 'some-secret-key', { expiresIn: '7d' });
+      res.send({ token });
+    })
+    .catch((err) => {
+      res
+        .status(UNAUTHORIZED)
+        .send({ message: err.message });
     });
 };
