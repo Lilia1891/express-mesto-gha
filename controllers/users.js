@@ -31,6 +31,23 @@ module.exports.getUserId = (req, res) => {
     });
 };
 
+module.exports.getUser = (req, res) => {
+  User.findById(req.params.userId)
+    .orFail(new NotFoundError('Запрашиваемый пользователь не найден'))
+    .then((user) => res.send({ data: user }))
+    .catch((err) => {
+      let {
+        status = INTERNAL_SERVER_ERROR,
+        message = 'На сервере произошла ошибка',
+      } = err;
+      if (err.name === 'CastError') {
+        status = BAD_REQUEST_ERROR;
+        message = 'Передан некорректный id';
+      }
+      res.status(status).send({ message });
+    });
+};
+
 module.exports.createUser = (req, res) => {
   const {
     name, about, avatar, email, password,
