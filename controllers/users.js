@@ -7,28 +7,32 @@ const {
   INTERNAL_SERVER_ERROR,
   UNAUTHORIZED,
 } = require('../constants');
+const ValidationError = require('../Errors/ValidationError');
+const ServerError = require('../Errors/ServerError');
 
-module.exports.getUsers = (req, res) => {
+module.exports.getUsers = (req, res, next) => {
   User.find({})
     .then((user) => res.send({ data: user }))
-    .catch(() => res.status(INTERNAL_SERVER_ERROR).send({ message: 'На сервере произошла ошибка' }));
+    .catch(() => {
+      throw new ServerError('На сервере произошла ошибка');
+    })
+    .catch(next);
 };
 
-module.exports.getUserId = (req, res) => {
+module.exports.getUserId = (req, res, next) => {
   User.findById(req.params.userId)
     .orFail(new NotFoundError('Запрашиваемый пользователь не найден'))
     .then((user) => res.send({ data: user }))
     .catch((err) => {
-      let {
-        status = INTERNAL_SERVER_ERROR,
-        message = 'На сервере произошла ошибка',
-      } = err;
-      if (err.name === 'CastError') {
-        status = BAD_REQUEST_ERROR;
-        message = 'Передан некорректный id';
+      if (err.name === 'NotFoundError') {
+        throw err;
+      } else if (err.name === 'CastError') {
+        throw new ValidationError('Передан некорректный id');
+      } else {
+        throw new ServerError('На сервере произошла ошибка');
       }
-      res.status(status).send({ message });
-    });
+    })
+    .catch(next);
 };
 
 module.exports.getUser = (req, res) => {

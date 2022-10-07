@@ -24,6 +24,10 @@ app.use('*', (req, res) => {
   res.status(NOT_FOUND_ERROR).send({ message: 'Страница не найдена' });
 });
 
+app.use((err, req, res, next) => {
+  res.status(err.status).send({ message: err.message });
+});
+
 mongoose.connect('mongodb://localhost:27017/mestodb', {
   useNewUrlParser: true,
 });
