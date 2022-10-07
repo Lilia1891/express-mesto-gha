@@ -32,7 +32,7 @@ module.exports.getUserId = (req, res) => {
 };
 
 module.exports.getUser = (req, res) => {
-  User.findById(req.params.userId)
+  User.findById(req.user._id)
     .orFail(new NotFoundError('Запрашиваемый пользователь не найден'))
     .then((user) => res.send({ data: user }))
     .catch((err) => {
@@ -42,7 +42,7 @@ module.exports.getUser = (req, res) => {
       } = err;
       if (err.name === 'CastError') {
         status = BAD_REQUEST_ERROR;
-        message = 'Передан некорректный id';
+        message = 'Передан некорректный id111';
       }
       res.status(status).send({ message });
     });

@@ -8,8 +8,8 @@ const {
 } = require('../controllers/users');
 
 router.get('/', getUsers);
-router.get('/:userId', getUserId);
 router.get('/me', getUser);
+router.get('/:userId', getUserId);
 router.patch('/me', updateUser);
 router.patch('/me/avatar', updateAvatar);
 
