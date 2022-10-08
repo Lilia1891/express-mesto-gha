@@ -5,6 +5,7 @@ const NotFoundError = require('../Errors/NotFoundError');
 const ValidationError = require('../Errors/ValidationError');
 const ServerError = require('../Errors/ServerError');
 const AuthorizationError = require('../Errors/AuthorizationError');
+const RegistrationError = require('../Errors/RegistrationError');
 
 module.exports.getUsers = (req, res, next) => {
   User.find({})
@@ -68,8 +69,11 @@ module.exports.createUser = (req, res, next) => {
       },
     }))
     .catch((err) => {
+      console.log(err);
       if (err.name === 'ValidationError') {
         throw new ValidationError('Переданы некорректные данные при создании пользователя.');
+      } else if (err.code === 11000) {
+        throw new RegistrationError('Такой email уже существует.');
       } else {
         throw new ServerError('На сервере произошла ошибка');
       }
