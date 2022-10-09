@@ -12,8 +12,7 @@ const {
 } = require('./controllers/users');
 const auth = require('./middlewares/auth');
 
-// eslint-disable-next-line no-useless-escape
-const urlRegExp = /(^https?:\/\/)([\w\-])+\.{1}([a-zA-Z]{2,63})([\/\w-]*)*\/?\??([^#\n\r]*)?#?([^\n\r]*)/;
+const urlRegExp = require('./utils');
 
 const { PORT = 3000 } = process.env;
 
