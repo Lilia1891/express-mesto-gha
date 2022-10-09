@@ -12,6 +12,9 @@ const {
 } = require('./controllers/users');
 const auth = require('./middlewares/auth');
 
+// eslint-disable-next-line no-useless-escape
+const urlRegExp = /(^https?:\/\/)([\w\-])+\.{1}([a-zA-Z]{2,63})([\/\w-]*)*\/?\??([^#\n\r]*)?#?([^\n\r]*)/;
+
 const { PORT = 3000 } = process.env;
 
 const app = express();
@@ -32,7 +35,7 @@ app.post('/signup', celebrate({
     password: Joi.string().required(),
     name: Joi.string().min(2).max(30),
     about: Joi.string().min(2).max(30),
-    avatar: Joi.string(),
+    avatar: Joi.string().required().regex(urlRegExp),
   }),
 }), createUser);
 
@@ -42,6 +45,7 @@ app.use('*', (req, res) => {
 
 app.use(errors());
 
+// eslint-disable-next-line no-unused-vars
 app.use((err, req, res, next) => {
   res.status(err.status).send({ message: err.message });
 });
