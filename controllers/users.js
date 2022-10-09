@@ -69,7 +69,6 @@ module.exports.createUser = (req, res, next) => {
       },
     }))
     .catch((err) => {
-      console.log(err);
       if (err.name === 'ValidationError') {
         throw new ValidationError('Переданы некорректные данные при создании пользователя.');
       } else if (err.code === 11000) {
@@ -83,7 +82,6 @@ module.exports.createUser = (req, res, next) => {
 
 module.exports.updateUser = (req, res, next) => {
   const { name, about } = req.body;
-  console.log(req.body.name, req.body.about);
   User.findByIdAndUpdate(
     req.user._id,
     { name, about },
