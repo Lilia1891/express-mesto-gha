@@ -29,21 +29,20 @@ module.exports.createCard = (req, res, next) => {
 
 module.exports.deleteCard = (req, res, next) => {
   Card.findById(req.params.cardId)
-    .orFail(new NotFoundError('Запрашиваемая карточка не найдена'))
     .then((card) => {
+      if (!card) {
+        throw new NotFoundError('Карточка не найдена');
+      }
       if (req.user._id === String(card.owner)) {
         return Card.findByIdAndRemove(req.params.cardId);
       }
-      throw new ForbiddenError('Нет прав на удаление этой карточки');
+      throw new ForbiddenError('Удалять карточку может только ее владелец');
     })
-    .catch((err) => {
-      if (err.name === 'NotFoundError' || err.name === 'ForbiddenError') {
-        throw err;
-      } else if (err.name === 'CastError') {
-        throw new ValidationError('Передан некорректный id');
-      } else {
-        throw new ServerError('На сервере произошла ошибка');
+    .then((card) => {
+      if (card) {
+        return res.status(200).send({ message: `Удалена карточка: ${card.name}, ${card.link}` });
       }
+      throw new NotFoundError('Карточка не найдена в базе');
     })
     .catch(next);
 };
