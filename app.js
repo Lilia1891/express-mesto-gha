@@ -23,10 +23,6 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use('/users', auth, userRouter);
 app.use('/cards', auth, cardRouter);
-// eslint-disable-next-line no-unused-vars
-app.use('*', auth, (req, res, next) => {
-  next(new NotFoundError('Страница не найдена'));
-});
 app.post('/signin', celebrate({
   body: Joi.object().keys({
     email: Joi.string().required().email(),
@@ -42,6 +38,11 @@ app.post('/signup', celebrate({
     avatar: Joi.string().regex(urlRegExp),
   }),
 }), createUser);
+
+// eslint-disable-next-line no-unused-vars
+app.use('*', auth, (req, res, next) => {
+  next(new NotFoundError('Страница не найдена'));
+});
 
 app.use(errors());
 
