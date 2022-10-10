@@ -5,7 +5,8 @@ const { celebrate, Joi } = require('celebrate');
 const { errors } = require('celebrate');
 const userRouter = require('./routes/users');
 const cardRouter = require('./routes/cards');
-const { NOT_FOUND_ERROR, INTERNAL_SERVER_ERROR } = require('./constants');
+const NotFoundError = require('./Errors/NotFoundError');
+const { INTERNAL_SERVER_ERROR } = require('./constants');
 const {
   createUser,
   login,
@@ -22,6 +23,10 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use('/users', auth, userRouter);
 app.use('/cards', auth, cardRouter);
+// eslint-disable-next-line no-unused-vars
+app.use('*', auth, (req, res, next) => {
+  next(new NotFoundError('Страница не найдена'));
+});
 app.post('/signin', celebrate({
   body: Joi.object().keys({
     email: Joi.string().required().email(),
@@ -38,19 +43,13 @@ app.post('/signup', celebrate({
   }),
 }), createUser);
 
-app.use('*', (req, res) => {
-  res.status(NOT_FOUND_ERROR).send({ message: 'Страница не найдена' });
-});
-
 app.use(errors());
 
 app.use((err, req, res, next) => {
-  if (!err.status) {
-    res.status(INTERNAL_SERVER_ERROR).send({ message: 'Ошибка сервера' });
-  } else {
-    res.status(err.status).send({ message: err.message });
-  }
-  return next;
+  const status = err.status || INTERNAL_SERVER_ERROR;
+  const message = status === INTERNAL_SERVER_ERROR ? 'Ошибка сервера' : err.message;
+  res.status(status).send({ message });
+  next();
 });
 
 mongoose.connect('mongodb://localhost:27017/mestodb', {
