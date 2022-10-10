@@ -18,15 +18,12 @@ module.exports.getUserId = (req, res, next) => {
     .orFail(new NotFoundError('Запрашиваемый пользователь не найден'))
     .then((user) => res.send({ data: user }))
     .catch((err) => {
-      if (err.name === 'NotFoundError') {
-        throw err;
-      } else if (err.name === 'CastError') {
-        throw new ValidationError('Передан некорректный id');
+      if (err.name === 'CastError') {
+        next(new ValidationError('Передан некорректный id'));
       } else {
-        throw new ServerError('На сервере произошла ошибка');
+        next(err);
       }
-    })
-    .catch(next);
+    });
 };
 
 module.exports.getUser = (req, res, next) => {
@@ -34,15 +31,12 @@ module.exports.getUser = (req, res, next) => {
     .orFail(new NotFoundError('Запрашиваемый пользователь не найден'))
     .then((user) => res.send({ data: user }))
     .catch((err) => {
-      if (err.name === 'NotFoundError') {
-        throw err;
-      } else if (err.name === 'CastError') {
-        throw new ValidationError('Передан некорректный id');
+      if (err.name === 'CastError') {
+        next(new ValidationError('Передан некорректный id'));
       } else {
-        throw new ServerError('На сервере произошла ошибка');
+        next(err);
       }
-    })
-    .catch(next);
+    });
 };
 
 module.exports.createUser = (req, res, next) => {
@@ -67,14 +61,13 @@ module.exports.createUser = (req, res, next) => {
     }))
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        throw new ValidationError('Переданы некорректные данные при создании пользователя.');
+        next(new ValidationError('Переданы некорректные данные при создании пользователя.'));
       } else if (err.code === 11000) {
-        throw new RegistrationError('Такой email уже существует.');
+        next(new RegistrationError('Такой email уже существует.'));
       } else {
-        throw new ServerError('На сервере произошла ошибка');
+        next(err);
       }
-    })
-    .catch(next);
+    });
 };
 
 module.exports.updateUser = (req, res, next) => {
@@ -88,12 +81,11 @@ module.exports.updateUser = (req, res, next) => {
     .then((user) => res.send({ data: user }))
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        throw new ValidationError('Переданы некорректные данные');
+        next(new ValidationError('Переданы некорректные данные'));
       } else {
-        throw new ServerError('На сервере произошла ошибка');
+        next(err);
       }
-    })
-    .catch(next);
+    });
 };
 
 module.exports.updateAvatar = (req, res, next) => {
@@ -110,12 +102,11 @@ module.exports.updateAvatar = (req, res, next) => {
     .then((user) => res.send({ data: user }))
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        throw new ValidationError('Переданы некорректные данные');
+        next(new ValidationError('Переданы некорректные данные'));
       } else {
-        throw new ServerError('На сервере произошла ошибка');
+        next(err);
       }
-    })
-    .catch(next);
+    });
 };
 
 module.exports.login = (req, res, next) => {
@@ -127,7 +118,7 @@ module.exports.login = (req, res, next) => {
       res.send({ token });
     })
     .catch(() => {
-      throw new AuthorizationError('Неправильные почта или пароль');
+      next(new AuthorizationError('Неправильные почта или пароль'));
     })
     .catch(next);
 };
