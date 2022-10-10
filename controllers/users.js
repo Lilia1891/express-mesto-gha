@@ -10,9 +10,6 @@ const RegistrationError = require('../Errors/RegistrationError');
 module.exports.getUsers = (req, res, next) => {
   User.find({})
     .then((user) => res.send({ data: user }))
-    .catch(() => {
-      throw new ServerError('На сервере произошла ошибка');
-    })
     .catch(next);
 };
 

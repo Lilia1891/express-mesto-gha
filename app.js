@@ -5,7 +5,7 @@ const { celebrate, Joi } = require('celebrate');
 const { errors } = require('celebrate');
 const userRouter = require('./routes/users');
 const cardRouter = require('./routes/cards');
-const { NOT_FOUND_ERROR } = require('./constants');
+const { NOT_FOUND_ERROR, INTERNAL_SERVER_ERROR } = require('./constants');
 const {
   createUser,
   login,
@@ -44,9 +44,13 @@ app.use('*', (req, res) => {
 
 app.use(errors());
 
-// eslint-disable-next-line no-unused-vars
 app.use((err, req, res, next) => {
-  res.status(err.status).send({ message: err.message });
+  if (!err.status) {
+    res.status(INTERNAL_SERVER_ERROR).send({ message: 'Ошибка сервера' });
+  } else {
+    res.status(err.status).send({ message: err.message });
+  }
+  return next;
 });
 
 mongoose.connect('mongodb://localhost:27017/mestodb', {

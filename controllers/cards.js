@@ -1,15 +1,11 @@
 const Card = require('../models/card');
 const NotFoundError = require('../Errors/NotFoundError');
 const ValidationError = require('../Errors/ValidationError');
-const ServerError = require('../Errors/ServerError');
 const ForbiddenError = require('../Errors/ForbiddenError');
 
 module.exports.getCards = (req, res, next) => {
   Card.find({})
     .then((card) => res.send({ data: card }))
-    .catch(() => {
-      throw new ServerError('На сервере произошла ошибка');
-    })
     .catch(next);
 };
 
@@ -19,12 +15,11 @@ module.exports.createCard = (req, res, next) => {
     .then((card) => res.send({ data: card }))
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        throw new ValidationError('Переданы некорректные данные');
+        next(new ValidationError('Переданы некорректные данные'));
       } else {
-        throw new ServerError('На сервере произошла ошибка');
+        next(err);
       }
-    })
-    .catch(next);
+    });
 };
 
 module.exports.deleteCard = (req, res, next) => {
@@ -56,15 +51,12 @@ module.exports.likeCard = (req, res, next) => {
     .orFail(new NotFoundError('Передан несуществующий id карточки.'))
     .then((user) => res.send({ data: user }))
     .catch((err) => {
-      if (err.name === 'NotFoundError') {
-        throw err;
-      } else if (err.name === 'CastError') {
-        throw new ValidationError('Передан некорректный id');
+      if (err.name === 'CastError') {
+        next(new ValidationError('Передан некорректный id'));
       } else {
-        throw new ServerError('На сервере произошла ошибка');
+        next(err);
       }
-    })
-    .catch(next);
+    });
 };
 
 module.exports.dislikeCard = (req, res, next) => {
@@ -76,13 +68,10 @@ module.exports.dislikeCard = (req, res, next) => {
     .orFail(new NotFoundError('Передан несуществующий id карточки.'))
     .then((user) => res.send({ data: user }))
     .catch((err) => {
-      if (err.name === 'NotFoundError') {
-        throw err;
-      } else if (err.name === 'CastError') {
-        throw new ValidationError('Передан некорректный id');
+      if (err.name === 'CastError') {
+        next(new ValidationError('Передан некорректный id'));
       } else {
-        throw new ServerError('На сервере произошла ошибка');
+        next(err);
       }
-    })
-    .catch(next);
+    });
 };
